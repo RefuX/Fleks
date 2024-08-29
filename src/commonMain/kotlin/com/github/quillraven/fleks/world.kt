@@ -5,6 +5,7 @@ import com.github.quillraven.fleks.collection.MutableEntityBag
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlin.native.concurrent.ThreadLocal
+import kotlin.time.Duration
 
 /**
  * Snapshot for an [entity][Entity] that contains its [components][Component] and [tags][EntityTag].
@@ -73,6 +74,9 @@ class World internal constructor(
      */
     val systems: List<IntervalSystem>
         get() = mutableSystems
+
+    private var updating = false
+    private val systemsToRemove = arrayListOf<IntervalSystem>()
 
     /**
      * Map of add [FamilyHook] out of the [WorldConfiguration].
@@ -250,6 +254,11 @@ class World internal constructor(
      * Removes the [system] of the world's [systems].
      */
     fun remove(system: IntervalSystem) {
+        if (updating) {
+            systemsToRemove += system
+            return
+        }
+
         mutableSystems.remove(system)
         if (system is IteratingSystem && (system is FamilyOnAdd || system is FamilyOnRemove)) {
             updateAggregatedFamilyHooks(system.family)
@@ -437,6 +446,7 @@ class World internal constructor(
      * using the given [deltaTime].
      */
     fun update(deltaTime: Float) {
+        updating = true
         this.deltaTime = deltaTime
         for (i in systems.indices) {
             val system = systems[i]
@@ -444,6 +454,17 @@ class World internal constructor(
                 system.onUpdate()
             }
         }
+        updating = false
+        systemsToRemove.forEach { remove(it) }
+        systemsToRemove.clear()
+    }
+
+    /**
+     * Updates all [enabled][IntervalSystem.enabled] [systems][IntervalSystem] of the world
+     * using the given [deltaTime].
+     */
+    fun update(deltaTime: Duration) {
+        update(deltaTime.inWholeNanoseconds / 1_000_000_000f)
     }
 
     /**
