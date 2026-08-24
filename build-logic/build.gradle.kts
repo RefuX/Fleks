@@ -8,4 +8,5 @@ dependencies {
     implementation(libs.gradlePlugin.kotlinDokka)
     implementation(libs.gradlePlugin.kotlinxBenchmark)
     implementation(libs.gradlePlugin.mavenPublish)
+    implementation(libs.gradlePlugin.kotlinxAtomic)
 }
