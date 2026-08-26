@@ -16,7 +16,11 @@ data object EachFrame : Interval
 /**
  * @param step the time in seconds when an [IntervalSystem] gets updated.
  */
-data class Fixed(val step: Float) : Interval
+data class Fixed(val step: Float) : Interval {
+    init {
+        require(step > 0f) { throw FleksInvalidFixedIntervalException(step) }
+    }
+}
 
 /**
  * A basic system of a [world][World] without a context to [entities][Entity].

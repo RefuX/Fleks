@@ -511,6 +511,20 @@ internal class SystemTest {
     }
 
     @Test
+    fun fixedIntervalWithZeroStepThrowsException() {
+        assertFailsWith<FleksInvalidFixedIntervalException> {
+            Fixed(0f)
+        }
+    }
+
+    @Test
+    fun fixedIntervalWithNegativeStepThrowsException() {
+        assertFailsWith<FleksInvalidFixedIntervalException> {
+            Fixed(-1f)
+        }
+    }
+
+    @Test
     fun testWorldModificationDuringConfiguration() {
         assertFailsWith<FleksWorldModificationDuringConfigurationException> {
             configureWorld {

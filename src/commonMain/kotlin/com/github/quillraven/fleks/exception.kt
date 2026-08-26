@@ -45,3 +45,6 @@ class FleksWorldModificationDuringConfigurationException :
             "Most likely in a constructor of a system. " +
             "Create those entities in the 'onInit' method of a system instead."
     )
+
+class FleksInvalidFixedIntervalException(step: Float) :
+    FleksException("Fixed interval step must be greater than 0 but was $step.")
