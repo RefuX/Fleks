@@ -24,14 +24,16 @@ data class FleksSprite(var path: String = "", var animationTime: Float = 0f) : C
 }
 
 class FleksSystemSimple : IteratingSystem(family { all(FleksPosition) }) {
+    private val position = world.componentHolder(FleksPosition)
 
     override fun onTickEntity(entity: Entity) {
-        entity[FleksPosition].x++
+        position[entity].x++
     }
 }
 
 class FleksSystemComplex1 : IteratingSystem(family { all(FleksPosition).none(FleksLife).any(FleksSprite) }) {
     private var actionCalls = 0
+    private val sprite = world.componentHolder(FleksSprite)
 
     override fun onTickEntity(entity: Entity) {
         if (actionCalls % 2 == 0) {
@@ -40,7 +42,7 @@ class FleksSystemComplex1 : IteratingSystem(family { all(FleksPosition).none(Fle
         } else {
             entity.configure { it -= FleksPosition }
         }
-        entity[FleksSprite].animationTime++
+        sprite[entity].animationTime++
         ++actionCalls
     }
 }
@@ -107,7 +109,7 @@ open class FleksStateComplex {
     }
 }
 
-@Fork(value = WARMUPS)
+@Fork(value = FORKS)
 @Warmup(iterations = WARMUPS)
 @Measurement(iterations = ITERATIONS, time = TIME, timeUnit = TimeUnit.SECONDS)
 open class FleksBenchmark {
@@ -118,7 +120,7 @@ open class FleksBenchmark {
                 it += FleksPosition()
             }
         }
-        
+
         state.world.removeAll()
     }
 

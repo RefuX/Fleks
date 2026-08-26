@@ -131,32 +131,32 @@ that represents the number of executed operations within three seconds.
 All Benchmarks are run within IntelliJ using the `benchmarksBenchmark` gradle task on my local computer. The hardware
 is:
 
-- Windows 10 64-bit
+- Fedora KDE 64-bit
 - 16 GB Ram
-- Intel i7-5820K @ 3.30Ghz
-- Java 8 target
+- AMD Ryzen 7 5700U @ 4.0Ghz
+- Java 17
 
 Here is the result (the higher the Score the better):
 
-| Library | Benchmark | Mode  | Cnt | Score   | Error     | Units |
-|---------|-----------|-------|-----|---------|-----------|-------|
+| Library | Benchmark | Mode  | Cnt | Score    | Error    | Units |
+|---------|-----------|-------|-----|----------|----------|-------|
 |         |
-| Ashley  | AddRemove | thrpt | 3   | 207,007 | ± 39,121  | ops/s |
-| Artemis | AddRemove | thrpt | 3   | 677,231 | ± 473,361 | ops/s |
-| Fleks   | AddRemove | thrpt | 3   | 841,916 | ± 75,492  | ops/s |
+| Ashley  | AddRemove | thrpt | 5   | 241,420  | ± 2,227  | ops/s |
+| Artemis | AddRemove | thrpt | 5   | 1.371,938| ± 46,878 | ops/s |
+| Fleks   | AddRemove | thrpt | 5   | 2.428,066| ± 45,263 | ops/s |
 |         |
-| Ashley  | Simple    | thrpt | 3   | 3,986   | ± 1,390   | ops/s |
-| Artemis | Simple    | thrpt | 3   | 32,830  | ± 2,965   | ops/s |
-| Fleks   | Simple    | thrpt | 3   | 33,017  | ± 3,089   | ops/s |
+| Ashley  | Simple    | thrpt | 5   | 20,186   | ± 2,163  | ops/s |
+| Artemis | Simple    | thrpt | 5   | 84,159   | ± 42,833 | ops/s |
+| Fleks   | Simple    | thrpt | 5   | 87,127   | ± 5,152  | ops/s |
 |         |
-| Ashley  | Complex   | thrpt | 3   | 0,056   | ± 0,117   | ops/s |
-| Artemis | Complex   | thrpt | 3   | 1,452   | ± 0,452   | ops/s |
-| Fleks   | Complex   | thrpt | 3   | 1,326   | ± 0,269   | ops/s |
+| Ashley  | Complex   | thrpt | 5   | 0,063    | ± 0,006  | ops/s |
+| Artemis | Complex   | thrpt | 5   | 1,990    | ± 0,027  | ops/s |
+| Fleks   | Complex   | thrpt | 5   | 1,426    | ± 0,039  | ops/s |
 
 I am not an expert for performance measurement, that's why you should take those numbers with a grain of salt but as you
 can see in the table:
 
 - Ashley is the slowest of the three libraries by far
-- Fleks is ~1.2x the speed of Artemis in the **AddRemove** benchmark
+- Fleks is ~1.8x the speed of Artemis in the **AddRemove** benchmark
 - Fleks is ~the same speed as Artemis in the **Simple** benchmark
-- Fleks is ~0.9x the speed of Artemis in the **Complex** benchmark
+- Fleks is ~0.7x the speed of Artemis in the **Complex** benchmark

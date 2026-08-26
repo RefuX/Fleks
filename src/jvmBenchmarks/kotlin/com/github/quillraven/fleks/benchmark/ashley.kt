@@ -111,7 +111,7 @@ open class AshleyStateComplex {
     }
 }
 
-@Fork(value = WARMUPS)
+@Fork(value = FORKS)
 @Warmup(iterations = WARMUPS)
 @Measurement(iterations = ITERATIONS, time = TIME, timeUnit = TimeUnit.SECONDS)
 open class AshleyBenchmark {

@@ -61,6 +61,44 @@ class EntityBagTest {
     }
 
     @Test
+    fun clearEnsuringCapacityGrowToLargerSize() {
+        val bag = MutableEntityBag(4)
+        bag += Entity(0)
+        bag += Entity(1)
+
+        bag.clearEnsuringCapacity(8)
+
+        assertEquals(0, bag.size)
+        assertTrue(bag.capacity >= 8)
+        assertFalse { Entity(0) in bag }
+        assertFalse { Entity(1) in bag }
+
+        // verify bag is usable after clear
+        bag += Entity(42)
+        assertEquals(1, bag.size)
+        assertTrue { Entity(42) in bag }
+    }
+
+    @Test
+    fun clearEnsuringCapacityKeepExistingCapacity() {
+        val bag = MutableEntityBag(16)
+        bag += Entity(0)
+        bag += Entity(1)
+
+        bag.clearEnsuringCapacity(8)
+
+        assertEquals(0, bag.size)
+        assertEquals(16, bag.capacity)
+        assertFalse { Entity(0) in bag }
+        assertFalse { Entity(1) in bag }
+
+        // verify bag is usable after clear
+        bag += Entity(42)
+        assertEquals(1, bag.size)
+        assertTrue { Entity(42) in bag }
+    }
+
+    @Test
     fun addValueToBagWithInsufficientCapacity() {
         val bag = MutableEntityBag(0)
 

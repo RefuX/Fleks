@@ -107,7 +107,7 @@ open class ArtemisStateComplex {
     }
 }
 
-@Fork(value = WARMUPS)
+@Fork(value = FORKS)
 @Warmup(iterations = WARMUPS)
 @Measurement(iterations = ITERATIONS, time = TIME, timeUnit = TimeUnit.SECONDS)
 open class ArtemisBenchmark {
@@ -116,9 +116,11 @@ open class ArtemisBenchmark {
         repeat(NUM_ENTITIES) {
             state.world.createEntity().edit().create(ArtemisPosition::class.java)
         }
+        state.world.process()
         repeat(NUM_ENTITIES) {
             state.world.delete(it)
         }
+        state.world.process()
     }
 
     @Benchmark

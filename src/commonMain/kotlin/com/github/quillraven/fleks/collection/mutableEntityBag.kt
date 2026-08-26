@@ -133,10 +133,10 @@ class MutableEntityBag(
     }
 
     /**
-     * Resets [size] to zero and clears any [entity][Entity] of the bag.
+     * Resets [size] to zero. The underlying array is not modified since all reads
+     * are bounded by [size].
      */
     fun clear() {
-        values.fill(Entity.NONE.id)
         size = 0
     }
 
@@ -150,14 +150,13 @@ class MutableEntityBag(
     }
 
     /**
-     * Resets [size] to zero, clears any [entity][Entity] of the bag, and if necessary,
-     * resizes the bag to be able to fit the given [capacity] of [entities][Entity].
+     * Resets [size] to zero, and if necessary, resizes the bag to be able to fit
+     * the given [capacity] of [entities][Entity]. The underlying array is not cleared
+     * since all reads are bounded by [size].
      */
     fun clearEnsuringCapacity(capacity: Int) {
         if (capacity > values.size) {
             values = IntArray(capacity + 1) { Entity.NONE.id }
-        } else {
-            values.fill(Entity.NONE.id)
         }
         size = 0
     }
