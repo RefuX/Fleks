@@ -5,6 +5,7 @@ kotlinxSerialization = "1.11.0"
 kotlinDokka = "2.2.0"
 kotlinxBenchmark = "0.4.17"
 mavenPublishPlugin = "0.37.0"
+kotlinxAtomic = "0.33.0"
 
 [libraries]
 
@@ -20,3 +21,4 @@ gradlePlugin-kotlinSerialization = { module = "org.jetbrains.kotlin:kotlin-seria
 gradlePlugin-kotlinDokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "kotlinDokka" }
 gradlePlugin-kotlinxBenchmark = { module = "org.jetbrains.kotlinx:kotlinx-benchmark-plugin", version.ref = "kotlinxBenchmark" }
 gradlePlugin-mavenPublish = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "mavenPublishPlugin" }
+gradlePlugin-kotlinxAtomic = { module = "org.jetbrains.kotlinx:atomicfu-gradle-plugin", version.ref = "kotlinxAtomic" }

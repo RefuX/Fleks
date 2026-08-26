@@ -2,9 +2,9 @@ package com.github.quillraven.fleks
 
 import com.github.quillraven.fleks.collection.Bag
 import com.github.quillraven.fleks.collection.bag
+import kotlinx.atomicfu.atomic
 import kotlinx.serialization.Serializable
 import kotlin.math.max
-import kotlin.native.concurrent.ThreadLocal
 
 /**
  * An interface that specifies a unique [id].
@@ -15,9 +15,8 @@ import kotlin.native.concurrent.ThreadLocal
 interface UniqueId<T> {
     val id: Int
 
-    @ThreadLocal
     companion object {
-        internal var nextId = 0
+        internal val nextId = atomic(0)
     }
 }
 
@@ -28,7 +27,7 @@ interface UniqueId<T> {
  */
 @Serializable
 abstract class ComponentType<T> : UniqueId<T> {
-    override val id: Int = UniqueId.nextId++
+    override val id: Int = UniqueId.nextId.getAndIncrement()
 }
 
 /**
