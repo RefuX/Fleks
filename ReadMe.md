@@ -114,11 +114,11 @@ also contains an example section for JVM and KMP projects.
 One important topic for me throughout the development of Fleks was performance. For that I compared Fleks with
 Artemis-odb and Ashley in three scenarios which you can find in the **jvmBenchmarks** source set:
 
-1) **AddRemove**: Creates 10_000 entities with a single component each and removes those entities.
-2) **Simple**: Steps the world 1_000 times for 10_000 entities with an `IteratingSystem` for a single component that
+1) **AddRemove**: Creates 20_000 entities with a single component each and removes those entities.
+2) **Simple**: Steps the world 1_000 times for 20_000 entities with an `IteratingSystem` for a single component that
    gets a `Float` counter increased by one every tick.
-3) **Complex**: Steps the world 1_000 times for 10_000 entities with two `IteratingSystem` and three components. It is a
-   time-consuming benchmark because all entities get added and removed from the first system each tick.
+3) **Complex**: Steps the world 1_000 times for 20_000 entities with two `IteratingSystem` and three components. It is a
+   time-consuming stress test benchmark because all entities get added and removed from the first system each tick.
     - Each entity gets initialized with ComponentA and ComponentC.
     - The first system requires ComponentA, ComponentC and not ComponentB. It switches between creating ComponentB or
       removing ComponentA. That way every entity gets removed from this system each tick.
@@ -128,35 +128,35 @@ Artemis-odb and Ashley in three scenarios which you can find in the **jvmBenchma
 I used [kotlinx-benchmark](https://github.com/Kotlin/kotlinx-benchmark) to create the benchmarks with a measurement
 that represents the number of executed operations within three seconds.
 
-All Benchmarks are run within IntelliJ using the `benchmarksBenchmark` gradle task on my local computer. The hardware
+All Benchmarks are run within IntelliJ using the `jvmBenchmarksBenchmark` gradle task on my local computer. The hardware
 is:
 
-- Fedora KDE 64-bit
-- 16 GB Ram
-- AMD Ryzen 7 5700U @ 4.0Ghz
-- Java 17
+- Windows 11 Enterprise 64-bit (Dell Precision 5570)
+- 64 GB Ram
+- 12th Gen Intel Core i9-12900H (14 cores / 20 threads)
+- Java 17 (Corretto)
 
 Here is the result (the higher the Score the better):
 
-| Library | Benchmark | Mode  | Cnt | Score    | Error    | Units |
-|---------|-----------|-------|-----|----------|----------|-------|
+| Library | Benchmark | Mode  | Cnt | Score    | Error      | Units |
+|---------|-----------|-------|-----|----------|------------|-------|
 |         |
-| Ashley  | AddRemove | thrpt | 5   | 241,420  | ± 2,227  | ops/s |
-| Artemis | AddRemove | thrpt | 5   | 1.371,938| ± 46,878 | ops/s |
-| Fleks   | AddRemove | thrpt | 5   | 2.428,066| ± 45,263 | ops/s |
+| Ashley  | AddRemove | thrpt | 20  | 71,512   | ± 1,187    | ops/s |
+| Artemis | AddRemove | thrpt | 20  | 781,089  | ± 18,112   | ops/s |
+| Fleks   | AddRemove | thrpt | 20  | 1.819,173| ± 76,831   | ops/s |
 |         |
-| Ashley  | Simple    | thrpt | 5   | 20,186   | ± 2,163  | ops/s |
-| Artemis | Simple    | thrpt | 5   | 84,159   | ± 42,833 | ops/s |
-| Fleks   | Simple    | thrpt | 5   | 87,127   | ± 5,152  | ops/s |
+| Ashley  | Simple    | thrpt | 20  | 6,071    | ± 0,946    | ops/s |
+| Artemis | Simple    | thrpt | 20  | 24,938   | ± 8,716    | ops/s |
+| Fleks   | Simple    | thrpt | 20  | 29,872   | ± 2,021    | ops/s |
 |         |
-| Ashley  | Complex   | thrpt | 5   | 0,063    | ± 0,006  | ops/s |
-| Artemis | Complex   | thrpt | 5   | 1,990    | ± 0,027  | ops/s |
-| Fleks   | Complex   | thrpt | 5   | 1,426    | ± 0,039  | ops/s |
+| Ashley  | Complex   | thrpt | 20  | 0,023    | ± 0,003    | ops/s |
+| Artemis | Complex   | thrpt | 20  | 1,314    | ± 0,004    | ops/s |
+| Fleks   | Complex   | thrpt | 20  | 1,025    | ± 0,006    | ops/s |
 
 I am not an expert for performance measurement, that's why you should take those numbers with a grain of salt but as you
 can see in the table:
 
 - Ashley is the slowest of the three libraries by far
-- Fleks is ~1.8x the speed of Artemis in the **AddRemove** benchmark
-- Fleks is ~the same speed as Artemis in the **Simple** benchmark
-- Fleks is ~0.7x the speed of Artemis in the **Complex** benchmark
+- Fleks is ~2.3x the speed of Artemis in the **AddRemove** benchmark
+- Fleks is ~1.2x the speed of Artemis in the **Simple** benchmark
+- Fleks is ~0.8x the speed of Artemis in the **Complex** benchmark
