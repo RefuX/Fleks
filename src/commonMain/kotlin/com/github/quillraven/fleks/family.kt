@@ -215,7 +215,6 @@ data class Family(
         // to guarantee a stable iteration. Check the 'snapshotEntities' documentation for more details.
         if (!isIterating && lastIterationVersion != activeEntities.version) {
             lastIterationVersion = activeEntities.version
-            snapshotEntities.clearEnsuringCapacity(activeEntities.size)
             activeEntities.copyTo(snapshotEntities)
         }
 
@@ -615,11 +614,12 @@ data class Family(
     @PublishedApi
     internal fun onEntityCfgChanged(entity: Entity, compMask: BitArray) {
         val entityInFamily = compMask in this
-        if (entityInFamily && entity !in activeEntities) {
+        val entityIsActive = entity in activeEntities
+        if (entityInFamily && !entityIsActive) {
             // new entity gets added
             activeEntities += entity
             addHook?.invoke(world, entity)
-        } else if (!entityInFamily && entity in activeEntities) {
+        } else if (!entityInFamily && entityIsActive) {
             // existing entity gets removed
             activeEntities -= entity
             removeHook?.invoke(world, entity)
