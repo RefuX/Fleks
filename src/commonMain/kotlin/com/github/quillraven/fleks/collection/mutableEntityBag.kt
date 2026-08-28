@@ -162,6 +162,17 @@ class MutableEntityBag(
     }
 
     /**
+     * Replaces the contents of this bag with all [entities][Entity] of the [other] bag
+     * using a single bulk array copy. Its [capacity] is grown if needed to fit all
+     * elements of the [other] bag.
+     */
+    fun copyFrom(other: MutableEntityBag) {
+        ensureCapacity(other.size)
+        other.values.copyInto(values, 0, 0, other.size)
+        size = other.size
+    }
+
+    /**
      * Sorts the bag according to the given [comparator].
      */
     fun sort(comparator: EntityComparator) {

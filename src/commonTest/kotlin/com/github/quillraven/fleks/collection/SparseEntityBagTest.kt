@@ -54,7 +54,7 @@ class SparseEntityBagTest {
         bag += testEntity2
         val valuesCalled = mutableListOf<Entity>()
 
-        bag.forEach { valuesCalled += it }
+        bag.dense.forEach { valuesCalled += it }
 
         assertContentEquals(listOf(testEntity3, testEntity1, testEntity2), valuesCalled)
     }
@@ -113,7 +113,7 @@ class SparseEntityBagTest {
         assertEquals(2, bag.size)
         assertTrue { testEntity1 in bag }
         assertTrue { testEntity2 in bag }
-        bag.forEach { assertTrue { it in bag } }
+        bag.dense.forEach { assertTrue { it in bag } }
     }
 
     @Test
@@ -132,7 +132,7 @@ class SparseEntityBagTest {
         assertTrue { testEntity1 in bag }
         assertTrue { testEntity2 in bag }
         assertTrue { testEntity3 in bag }
-        bag.forEach { assertTrue { it in bag } }
+        bag.dense.forEach { assertTrue { it in bag } }
     }
 
     @Test
@@ -150,7 +150,7 @@ class SparseEntityBagTest {
         assertFalse { testEntity1 in bag }
         assertTrue { testEntity2 in bag }
         assertTrue { testEntity3 in bag }
-        bag.forEach { assertTrue { it in bag } }
+        bag.dense.forEach { assertTrue { it in bag } }
     }
 
     @Test

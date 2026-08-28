@@ -108,11 +108,12 @@ class SparseEntityBag(
     }
 
     /**
-     * Performs the given [action] for all [entities][Entity] of the bag in the order of the
-     * [dense] array.
+     * Copies all [entities][Entity] of this bag into the [dst] bag, replacing its previous
+     * contents. The copy happens in a single bulk array copy of the densely packed [dense]
+     * array.
      */
-    inline fun forEach(action: (Entity) -> Unit) {
-        dense.forEach(action)
+    fun copyTo(dst: MutableEntityBag) {
+        dst.copyFrom(dense)
     }
 
     private fun ensureSparseCapacity(entityId: Int) {

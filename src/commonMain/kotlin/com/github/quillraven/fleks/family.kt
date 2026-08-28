@@ -216,7 +216,7 @@ data class Family(
         if (!isIterating && lastIterationVersion != activeEntities.version) {
             lastIterationVersion = activeEntities.version
             snapshotEntities.clearEnsuringCapacity(activeEntities.size)
-            activeEntities.forEach { snapshotEntities += it }
+            activeEntities.copyTo(snapshotEntities)
         }
 
         val entitiesForIteration = snapshotEntities
