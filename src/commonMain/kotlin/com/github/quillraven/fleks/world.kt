@@ -1,5 +1,6 @@
 package com.github.quillraven.fleks
 
+import com.github.quillraven.fleks.collection.BitArray
 import com.github.quillraven.fleks.collection.EntityBag
 import com.github.quillraven.fleks.collection.MutableEntityBag
 import kotlinx.serialization.Contextual
@@ -487,6 +488,84 @@ class World internal constructor(
         entityService.removeAll()
         systems.forEachReverse { it.onDispose() }
     }
+
+    /**
+     * Returns all [component types][ComponentType] and [tags][EntityTag] that are referenced by the world,
+     * sorted by their [id][UniqueId.id]: by a [ComponentsHolder] or by the tag cache of [snapshot].
+     * A type stays referenced until it gets retired via [retireComponentTypes].
+     * Note that a [ComponentsHolder] is also created by reading a type, e.g. via [componentHolder].
+     * A [Family] only references the ids of its types and therefore does not count.
+     */
+    fun componentTypesInUse(): List<UniqueId<*>> =
+        buildList {
+            componentService.holdersBag.forEach { holder -> add(holder.type) }
+            addAll(tagCache.values)
+        }.sortedBy { it.id }
+
+    /**
+     * Retires the given [component types][ComponentType] and [tags][EntityTag]: removes them from any
+     * [entity][Entity] (calling [Component.onRemove]) and reclaims their [ComponentsHolder] and their
+     * tag cache entry. Afterwards, the world no longer references the types or any of their components.
+     * Types that are not referenced by the world (see [componentTypesInUse]) are ignored.
+     *
+     * [Families][Family] are updated like for any other component removal, including their [FamilyHook]s,
+     * and keep working because the ids of retired types are not reused.
+     * A retired type can be used again, which creates a new [ComponentsHolder].
+     * A [ComponentsHolder] that was retrieved before (e.g. via [componentHolder]) must not be used anymore.
+     * [Component.onRemove] must not add a retired type to any entity, because its [ComponentsHolder] gets reclaimed.
+     *
+     * This is necessary for dynamically loaded code: when component classes get unloaded the world
+     * would otherwise keep references to them forever.
+     *
+     * @throws FleksRetireComponentTypesException if a family iteration is in process
+     * or if an [entity][Entity] gets created or configured.
+     */
+    fun retireComponentTypes(types: Collection<UniqueId<*>>) {
+        if (entityService.delayRemoval) {
+            throw FleksRetireComponentTypesException("a family iteration is in process")
+        }
+        if (entityService.createId != -1 || entityService.updateId != -1) {
+            throw FleksRetireComponentTypesException("an entity gets created or configured")
+        }
+        if (types.isEmpty()) {
+            return
+        }
+        val retiredMask = BitArray(64).apply { types.forEach { set(it.id) } }
+
+        // remove the retired types from any entity and update the families like configure does
+        entityService.forEach { entity ->
+            val compMask = entityService.compMasks[entity.id]
+            if (!compMask.intersects(retiredMask)) {
+                return@forEach
+            }
+            types.forEach { type ->
+                if (compMask[type.id]) {
+                    compMask.clear(type.id)
+                    // a tag has no holder -> nothing else to remove
+                    componentService.holderByIndexOrNull(type.id)?.minusAssign(entity)
+                }
+            }
+            if (entity !in entityService) {
+                // a Component.onRemove removed the entity which already updated the families
+                return@forEach
+            }
+            allFamilies.forEach { it.onEntityCfgChanged(entity, compMask) }
+        }
+
+        // reclaim holders and tag cache entries
+        types.forEach { type ->
+            if (componentService.holdersBag.hasValueAtIndex(type.id)) {
+                componentService.holdersBag.removeAt(type.id)
+            }
+            tagCache.remove(type.id)
+        }
+    }
+
+    /**
+     * Retires the given [component types][ComponentType] and [tags][EntityTag].
+     * Refer to [retireComponentTypes] for details.
+     */
+    fun retireComponentTypes(vararg types: UniqueId<*>) = retireComponentTypes(types.asList())
 
     /**
      * Extend [Family.addHook] and [Family.removeHook] for all
