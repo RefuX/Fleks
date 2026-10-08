@@ -491,10 +491,7 @@ class World internal constructor(
 
     /**
      * Returns all [component types][ComponentType] and [tags][EntityTag] that are referenced by the world,
-     * sorted by their [id][UniqueId.id]: by a [ComponentsHolder] or by the tag cache of [snapshot].
-     * A type stays referenced until it gets retired via [retireComponentTypes].
-     * Note that a [ComponentsHolder] is also created by reading a type, e.g. via [componentHolder].
-     * A [Family] only references the ids of its types and therefore does not count.
+     * sorted by their id. Use [retireComponentTypes] to release them.
      */
     fun componentTypesInUse(): List<UniqueId<*>> =
         buildList {
@@ -503,19 +500,11 @@ class World internal constructor(
         }.sortedBy { it.id }
 
     /**
-     * Retires the given [component types][ComponentType] and [tags][EntityTag]: removes them from any
-     * [entity][Entity] (calling [Component.onRemove]) and reclaims their [ComponentsHolder] and their
-     * tag cache entry. Afterwards, the world no longer references the types or any of their components.
-     * Types that are not referenced by the world (see [componentTypesInUse]) are ignored.
+     * Removes the given [component types][ComponentType] and [tags][EntityTag] from all [entities][Entity]
+     * and releases the world's references to them, e.g. when unloading dynamically loaded code.
      *
-     * [Families][Family] are updated like for any other component removal, including their [FamilyHook]s,
-     * and keep working because the ids of retired types are not reused.
-     * A retired type can be used again, which creates a new [ComponentsHolder].
-     * A [ComponentsHolder] that was retrieved before (e.g. via [componentHolder]) must not be used anymore.
-     * [Component.onRemove] must not add a retired type to any entity, because its [ComponentsHolder] gets reclaimed.
-     *
-     * This is necessary for dynamically loaded code: when component classes get unloaded the world
-     * would otherwise keep references to them forever.
+     * A retired type can be used again, but a [ComponentsHolder] retrieved before must not be used anymore.
+     * [Component.onRemove] must not add a retired type again.
      *
      * @throws FleksRetireComponentTypesException if a family iteration is in process
      * or if an [entity][Entity] gets created or configured.
